@@ -29,7 +29,6 @@ class DetailFragment : Fragment() {
         binding = DataBindingUtil.inflate(inflater, R.layout.detail_layout, container, false)
         binding.viewModel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
-        binding.toolBar.setupWithNavController(findNavController())
         return binding.root
     }
 

@@ -15,3 +15,6 @@ const val PAGE_LIMIT = 20
 const val NO_ITEM = "NO_ITEM"
 
 const val THREADS = 5
+
+const val QUERY = "QUERY"
+const val ICONIFIED = "ICONIFIED"

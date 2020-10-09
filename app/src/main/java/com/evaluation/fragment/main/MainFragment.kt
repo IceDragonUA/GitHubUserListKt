@@ -1,29 +1,29 @@
 package com.evaluation.fragment.main
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.appcompat.widget.SearchView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.ui.setupWithNavController
 import com.evaluation.R
 import com.evaluation.adapter.AdapterItemClickListener
 import com.evaluation.databinding.MainLayoutBinding
+import com.evaluation.utils.ICONIFIED
+import com.evaluation.utils.QUERY
 import com.evaluation.utils.autoCleared
 import com.evaluation.viewmodel.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
+
 
 /**
  * @author Vladyslav Havrylenko
  * @since 09.03.2020
  */
 @AndroidEntryPoint
-class MainFragment : Fragment(), AdapterItemClickListener<String> {
+class MainFragment : Fragment(), AdapterItemClickListener<String>, SearchView.OnQueryTextListener, MenuItem.OnActionExpandListener {
 
     private var binding: MainLayoutBinding by autoCleared()
 
@@ -31,53 +31,112 @@ class MainFragment : Fragment(), AdapterItemClickListener<String> {
 
     private var queryTextChangedJob: Job? = null
 
+    private var lastSearchQuery: String? = null
+
+    private var isIconified: Boolean = true
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        setHasOptionsMenu(true)
+        super.onCreate(savedInstanceState)
+        restoreInstance(savedInstanceState)
+    }
+
+    private fun restoreInstance(savedInstanceState: Bundle?) {
+        val query = savedInstanceState?.getString(QUERY)
+        if (query != null) {
+            lastSearchQuery = query
+        }
+        val iconified = savedInstanceState?.getBoolean(ICONIFIED)
+        if (iconified != null) {
+            isIconified = iconified
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        if (lastSearchQuery != null) {
+            outState.putString(QUERY, lastSearchQuery)
+        }
+        outState.putBoolean(ICONIFIED, isIconified)
+        super.onSaveInstanceState(outState)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.main_layout, container, false)
         binding.viewModel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
-        binding.toolBar.setupWithNavController(findNavController())
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initView()
+        initRootView()
         initLoader()
     }
 
-    private fun initView() {
-        binding.toolBar.setOnMenuItemClickListener {
-            when (it.itemId) {
-                R.id.search -> {
-                    val searchView = it.actionView as SearchView
-                    searchView.queryHint = getString(R.string.search)
-                    searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-                        override fun onQueryTextSubmit(query: String?): Boolean {
-                            return false
-                        }
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu, menu)
+        initSearchView(menu)
+        super.onCreateOptionsMenu(menu, inflater);
+    }
 
-                        override fun onQueryTextChange(query: String?): Boolean {
-                            queryTextChangedJob?.cancel()
-                            queryTextChangedJob = GlobalScope.launch(Dispatchers.Main) {
-                                delay(500)
-                                if (!query.isNullOrEmpty()) viewModel.search(query)
-                            }
-                            return false
-                        }
-                    })
-                    true
-                }
-                else -> false
-            }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.search -> true
+            else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun initSearchView(menu: Menu){
+        val menuItem = menu.findItem(R.id.search)
+        menuItem.setOnActionExpandListener(this)
+        val search = menuItem?.actionView as? SearchView
+        search?.maxWidth = Integer.MAX_VALUE
+        search?.queryHint = getString(R.string.search)
+        search?.setOnQueryTextListener(this)
+        if (!isIconified) {
+            menuItem.expandActionView()
+        }
+        if (lastSearchQuery != null) {
+            search?.setQuery(lastSearchQuery, true)
+        }
+    }
+
+    override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
+        isIconified = false
+        return true
+    }
+
+    override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
+        isIconified = true
+        return true
+    }
+
+    override fun onQueryTextSubmit(query: String?): Boolean = false
+
+    override fun onQueryTextChange(query: String?): Boolean {
+        queryTextChangedJob?.cancel()
+        queryTextChangedJob = GlobalScope.launch(Dispatchers.Main) {
+            delay(500)
+            if (!query.isNullOrEmpty()) {
+                if (lastSearchQuery != query) {
+                    viewModel.search(query)
+                }
+            }
+            lastSearchQuery = query
+        }
+        return false
+    }
+
+    private fun initRootView() {
         binding.listView.listener = this
+    }
+
+    override fun onClicked(item: String) {
+        findNavController().navigate(MainFragmentDirections.actionMainFragmentToDetailFragment(item))
     }
 
     private fun initLoader() {
         viewModel.items.observe(viewLifecycleOwner, binding.listView.adapter::submitList)
     }
 
-    override fun onClicked(item: String) {
-        findNavController().navigate(MainFragmentDirections.actionMainFragmentToDetailFragment(item))
-    }
 }

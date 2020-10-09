@@ -7,20 +7,22 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.ui.setupWithNavController
+import androidx.navigation.findNavController
 import com.evaluation.R
+import com.evaluation.adapter.AdapterItemClickListener
+import com.evaluation.adapter.viewholders.item.BaseItemView
 import com.evaluation.databinding.DetailLayoutBinding
 import com.evaluation.utils.autoCleared
 import com.evaluation.viewmodel.DetailViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 
 /**
  * @author Vladyslav Havrylenko
  * @since 09.10.2020
  */
 @AndroidEntryPoint
-class DetailFragment : Fragment() {
+class DetailFragment : Fragment(), AdapterItemClickListener<BaseItemView> {
 
     private var binding: DetailLayoutBinding by autoCleared()
     private val viewModel: DetailViewModel by viewModels()
@@ -34,6 +36,21 @@ class DetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        var args = DetailFragmentArgs.fromBundle(requireArguments())
+        val fromBundle = DetailFragmentArgs.fromBundle(requireArguments())
+        initRootView()
+        initLoader(fromBundle)
+    }
+
+    private fun initRootView() {
+        binding.listView.listener = this
+    }
+
+    override fun onClicked(item: BaseItemView) {
+        Timber.d("Details view item clicked: $item")
+    }
+
+    private fun initLoader(fromBundle: DetailFragmentArgs) {
+        viewModel.items.observe(viewLifecycleOwner, binding.listView.adapter::submitList)
+        viewModel.load(fromBundle.userId)
     }
 }

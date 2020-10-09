@@ -11,4 +11,6 @@ interface AppInteraction {
 
     fun searchUsers(query: String): Listing<BaseItemView>
 
+    fun userDetails(query: String): Listing<BaseItemView>
+
 }

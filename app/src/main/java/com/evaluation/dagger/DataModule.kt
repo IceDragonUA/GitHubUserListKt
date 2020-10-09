@@ -1,17 +1,15 @@
 package com.evaluation.dagger
 
 import android.content.Context
-import androidx.lifecycle.LiveData
-import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import androidx.room.Room
-import com.evaluation.adapter.viewholders.item.BaseItemView
 import com.evaluation.network.RestApi
 import com.evaluation.network.dao.AppRestApiDao
 import com.evaluation.repository.AppRepository
 import com.evaluation.database.AppDatabase
 import com.evaluation.database.dao.AppDatabaseDao
-import com.evaluation.datasource.UserDataSourceFactory
+import com.evaluation.datasource.detail.DetailDataSourceFactory
+import com.evaluation.datasource.main.UserDataSourceFactory
 import com.evaluation.interaction.AppInteraction
 import com.evaluation.interaction.AppInteractionImpl
 import com.evaluation.utils.BASE_URL
@@ -86,8 +84,13 @@ object DataModule {
 
     @Singleton
     @Provides
-    fun appInteraction(factory: UserDataSourceFactory, config: PagedList.Config, networkExecutor: Executor): AppInteraction =
-        AppInteractionImpl(factory, config, networkExecutor)
+    fun appInteraction(
+        userFactory: UserDataSourceFactory,
+        detailFactory: DetailDataSourceFactory,
+        config: PagedList.Config,
+        networkExecutor: Executor
+    ): AppInteraction =
+        AppInteractionImpl(userFactory, detailFactory, config, networkExecutor)
 
     @Singleton
     @Provides

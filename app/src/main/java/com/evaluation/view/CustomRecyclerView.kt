@@ -16,7 +16,7 @@ import com.evaluation.adapter.viewholders.item.BaseItemView
  */
 class CustomRecyclerView : RecyclerView, AdapterItemClickListener<BaseItemView> {
 
-    lateinit var listener: AdapterItemClickListener<String>
+    lateinit var listener: AdapterItemClickListener<BaseItemView>
 
     constructor(context: Context) : this(context, null)
 
@@ -32,6 +32,6 @@ class CustomRecyclerView : RecyclerView, AdapterItemClickListener<BaseItemView> 
         super.getAdapter() as CustomListAdapter
 
     override fun onClicked(item: BaseItemView) {
-        listener.onClicked(item.id)
+        listener.onClicked(item)
     }
 }

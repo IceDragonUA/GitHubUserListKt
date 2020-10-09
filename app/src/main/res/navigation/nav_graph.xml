@@ -16,9 +16,12 @@
     <fragment
         android:id="@+id/detailFragment"
         android:name="com.evaluation.fragment.detail.DetailFragment"
-        android:label="DetailFragment" >
+        android:label="{userLogin}" >
         <argument
-            android:name="item"
+            android:name="userId"
+            app:argType="string" />
+        <argument
+            android:name="userLogin"
             app:argType="string" />
     </fragment>
 

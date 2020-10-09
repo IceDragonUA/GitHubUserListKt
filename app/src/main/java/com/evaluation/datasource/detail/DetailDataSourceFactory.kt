@@ -1,4 +1,4 @@
-package com.evaluation.datasource
+package com.evaluation.datasource.detail
 
 import androidx.paging.DataSource
 import com.evaluation.adapter.viewholders.item.BaseItemView
@@ -10,7 +10,7 @@ import javax.inject.Inject
  * @since 08.10.2020
  */
 
-class UserDataSourceFactory @Inject constructor(private var dataSource: UserDataSource) :
+class DetailDataSourceFactory @Inject constructor(private var dataSource: DetailDataSource) :
     DataSource.Factory<Int, BaseItemView>() {
 
     var query = empty()

@@ -9,6 +9,8 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.evaluation.R
 import com.evaluation.adapter.AdapterItemClickListener
+import com.evaluation.adapter.viewholders.item.BaseItemView
+import com.evaluation.adapter.viewholders.item.CardItemView
 import com.evaluation.databinding.MainLayoutBinding
 import com.evaluation.utils.ICONIFIED
 import com.evaluation.utils.QUERY
@@ -23,7 +25,8 @@ import kotlinx.coroutines.*
  * @since 09.03.2020
  */
 @AndroidEntryPoint
-class MainFragment : Fragment(), AdapterItemClickListener<String>, SearchView.OnQueryTextListener, MenuItem.OnActionExpandListener {
+class MainFragment : Fragment(), AdapterItemClickListener<BaseItemView>,
+    SearchView.OnQueryTextListener, MenuItem.OnActionExpandListener {
 
     private var binding: MainLayoutBinding by autoCleared()
 
@@ -73,9 +76,13 @@ class MainFragment : Fragment(), AdapterItemClickListener<String>, SearchView.On
         initLoader()
     }
 
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        super.onPrepareOptionsMenu(menu)
+        initSearchView(menu)
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu, menu)
-        initSearchView(menu)
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -86,7 +93,7 @@ class MainFragment : Fragment(), AdapterItemClickListener<String>, SearchView.On
         }
     }
 
-    private fun initSearchView(menu: Menu){
+    private fun initSearchView(menu: Menu) {
         val menuItem = menu.findItem(R.id.search)
         menuItem.setOnActionExpandListener(this)
         val search = menuItem?.actionView as? SearchView
@@ -97,7 +104,7 @@ class MainFragment : Fragment(), AdapterItemClickListener<String>, SearchView.On
             menuItem.expandActionView()
         }
         if (lastSearchQuery != null) {
-            search?.setQuery(lastSearchQuery, true)
+            search?.setQuery(lastSearchQuery, false)
         }
     }
 
@@ -115,14 +122,16 @@ class MainFragment : Fragment(), AdapterItemClickListener<String>, SearchView.On
 
     override fun onQueryTextChange(query: String?): Boolean {
         queryTextChangedJob?.cancel()
-        queryTextChangedJob = GlobalScope.launch(Dispatchers.Main) {
-            delay(500)
-            if (!query.isNullOrEmpty()) {
-                if (lastSearchQuery != query) {
-                    viewModel.search(query)
+        if (isAdded) {
+            queryTextChangedJob = GlobalScope.launch(Dispatchers.Main) {
+                delay(500)
+                if (!query.isNullOrEmpty()) {
+                    if (lastSearchQuery != query) {
+                        viewModel.search(query)
+                    }
                 }
+                lastSearchQuery = query
             }
-            lastSearchQuery = query
         }
         return false
     }
@@ -131,8 +140,10 @@ class MainFragment : Fragment(), AdapterItemClickListener<String>, SearchView.On
         binding.listView.listener = this
     }
 
-    override fun onClicked(item: String) {
-        findNavController().navigate(MainFragmentDirections.actionMainFragmentToDetailFragment(item))
+    override fun onClicked(item: BaseItemView) {
+        when (item) {
+            is CardItemView -> findNavController().navigate(MainFragmentDirections.actionMainFragmentToDetailFragment(item.id, item.user.login))
+        }
     }
 
     private fun initLoader() {

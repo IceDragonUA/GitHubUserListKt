@@ -6,8 +6,20 @@
 
     <fragment
         android:id="@+id/mainFragment"
-        android:name="com.evaluation.fragment.MainFragment"
+        android:name="com.evaluation.fragment.main.MainFragment"
         android:label="@string/users">
+        <action
+            android:id="@+id/action_mainFragment_to_detailFragment"
+            app:destination="@id/detailFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/detailFragment"
+        android:name="com.evaluation.fragment.detail.DetailFragment"
+        android:label="DetailFragment" >
+        <argument
+            android:name="item"
+            app:argType="string" />
     </fragment>
 
 </navigation>

@@ -24,5 +24,5 @@ data class User(
     val received_events_url: String,
     val type: String,
     val score: Int,
-    val pages: Int = 0
+    var time: Long = 0
 )

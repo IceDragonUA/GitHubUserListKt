@@ -22,22 +22,3 @@ fun ImageView.loadFromUrl(url: String) {
         .load(url)
         .into(this)
 }
-
-fun <T> LiveData<Resource<T>>.observeOnce(observer: Observer<Resource<T>>) {
-    observeForever(object : Observer<Resource<T>> {
-        override fun onChanged(resource: Resource<T>) {
-            observer.onChanged(resource)
-            when (resource.status) {
-                Resource.Status.SUCCESS -> {
-                    removeObserver(this)
-                }
-
-                Resource.Status.ERROR -> {
-                    removeObserver(this)
-                }
-
-                else -> Resource.Status.LOADING
-            }
-        }
-    })
-}

@@ -1,6 +1,5 @@
 package com.evaluation.database.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -10,8 +9,11 @@ import com.evaluation.model.User
 @Dao
 interface AppDatabaseDao {
 
-    @Query("SELECT * FROM users")
-    fun userList(): LiveData<List<User>>
+    @Query("SELECT * FROM users ORDER BY time ASC")
+    fun userList(): List<User>
+
+    @Query("SELECT * FROM users ORDER BY time ASC LIMIT :limit OFFSET :offset ")
+    fun userPagedList(limit: Int, offset: Int): List<User>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertList(users: List<User>)

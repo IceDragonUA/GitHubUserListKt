@@ -1,28 +1,43 @@
 package com.evaluation.network.dao
 
-import android.net.UrlQuerySanitizer
-import com.evaluation.utils.Resource
+import retrofit2.Call
+import retrofit2.Callback
 import retrofit2.Response
-import timber.log.Timber
+import java.io.IOException
 
 abstract class BaseRestApiDao {
 
-    protected suspend fun <T> result(call: suspend () -> Response<T>): Resource<T> {
+    protected inline fun <T> syncRequest(request: Call<T>,
+                               onSuccess: (T) -> Unit,
+                               onError: (String) -> Unit) {
         try {
-            val response = call()
-            if (response.isSuccessful) {
-                val body = response.body()
-                if (body != null) return Resource.success(UrlQuerySanitizer(response.headers()["link"]).getValue("page"), body)
-            }
-            return error(" ${response.code()} ${response.message()}")
-        } catch (e: Exception) {
-            return error(e.message ?: e.toString())
+            val response = request.execute()
+            val body = response.body()
+            if (body != null) onSuccess(body)
+            else onError("Network call has failed for a following reason: ${response.code()} ${response.message()}")
+        } catch (exception: IOException) {
+            onError("Network call has failed for a following reason: ${exception.message ?: exception.toString()}")
         }
     }
 
-    private fun <T> error(message: String): Resource<T> {
-        Timber.d(message)
-        return Resource.error("Network call has failed for a following reason: $message")
+    protected inline fun <T> asyncRequest(request: Call<T>,
+                                crossinline onSuccess: (T) -> Unit,
+                                crossinline onError: (String) -> Unit) {
+        request.enqueue(object : Callback<T> {
+            override fun onFailure(call: Call<T>, throwable: Throwable) {
+                onError("Network call has failed for a following reason: ${throwable.message ?: throwable.toString()}")
+            }
+
+            override fun onResponse(call: Call<T>, response: Response<T>) {
+                if (response.isSuccessful) {
+                    val body = response.body()
+                    if (body != null) onSuccess(body)
+                    else onError("Network call has failed for a following reason: ${response.code()} ${response.message()}")
+                } else {
+                    onError("Network call has failed for a following reason: ${response.code()} ${response.message()}")
+                }
+            }
+        })
     }
 
 }

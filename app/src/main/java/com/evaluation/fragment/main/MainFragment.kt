@@ -1,21 +1,18 @@
-package com.evaluation.fragment
+package com.evaluation.fragment.main
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
-import androidx.core.os.bundleOf
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.evaluation.R
 import com.evaluation.adapter.AdapterItemClickListener
-import com.evaluation.adapter.viewholders.CardItemHolder
-import com.evaluation.adapter.viewholders.NoItemHolder
 import com.evaluation.databinding.MainLayoutBinding
-import com.evaluation.utils.ModeType
 import com.evaluation.utils.autoCleared
 import com.evaluation.viewmodel.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -35,8 +32,10 @@ class MainFragment : Fragment(), AdapterItemClickListener<String> {
     private var queryTextChangedJob: Job? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = MainLayoutBinding.inflate(inflater, container, false)
-        binding.toolBar.setupWithNavController(this.findNavController())
+        binding = DataBindingUtil.inflate(inflater, R.layout.main_layout, container, false)
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.toolBar.setupWithNavController(findNavController())
         return binding.root
     }
 
@@ -57,11 +56,11 @@ class MainFragment : Fragment(), AdapterItemClickListener<String> {
                             return false
                         }
 
-                        override fun onQueryTextChange(word: String?): Boolean {
+                        override fun onQueryTextChange(query: String?): Boolean {
                             queryTextChangedJob?.cancel()
                             queryTextChangedJob = GlobalScope.launch(Dispatchers.Main) {
                                 delay(500)
-                                if (!word.isNullOrEmpty()) viewModel.search(word)
+                                if (!query.isNullOrEmpty()) viewModel.search(query)
                             }
                             return false
                         }
@@ -75,28 +74,10 @@ class MainFragment : Fragment(), AdapterItemClickListener<String> {
     }
 
     private fun initLoader() {
-        viewModel.iterator.observe(viewLifecycleOwner, { source ->
-            source?.third?.let {
-                when (it) {
-                    ModeType.LOADING -> {
-                        source.first?.let { state ->
-                            binding.progressSpinner.visibility = if (state) View.VISIBLE else View.GONE
-                        }
-                    }
-                    ModeType.UPDATE -> {
-                        source.second?.let { users ->
-                            binding.listView.adapter.submitList(users)
-                        }
-                    }
-                }
-            }
-        })
+        viewModel.items.observe(viewLifecycleOwner, binding.listView.adapter::submitList)
     }
 
     override fun onClicked(item: String) {
-        findNavController()/*.navigate(
-            R.id.action_charactersFragment_to_characterDetailFragment,
-            bundleOf("id" to item)
-        )*/
+        findNavController().navigate(MainFragmentDirections.actionMainFragmentToDetailFragment(item))
     }
 }

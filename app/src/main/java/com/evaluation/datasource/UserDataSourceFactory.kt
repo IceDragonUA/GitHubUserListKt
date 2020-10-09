@@ -11,14 +11,13 @@ import javax.inject.Inject
  */
 
 class UserDataSourceFactory @Inject constructor(private var dataSource: UserDataSource) :
-    DataSource.Factory<String, BaseItemView>() {
+    DataSource.Factory<Int, BaseItemView>() {
 
-    var state = dataSource.state
+    var query = empty()
+    var network = dataSource.network
 
-    var word: String = empty()
-
-    override fun create(): DataSource<String, BaseItemView> {
-        dataSource.word = word
+    override fun create(): DataSource<Int, BaseItemView> {
+        dataSource.query = query
         return dataSource
     }
 

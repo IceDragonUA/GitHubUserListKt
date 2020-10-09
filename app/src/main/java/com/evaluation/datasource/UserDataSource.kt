@@ -1,21 +1,13 @@
 package com.evaluation.datasource
 
-import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.PageKeyedDataSource
-import com.evaluation.R
 import com.evaluation.adapter.viewholders.item.BaseItemView
-import com.evaluation.adapter.viewholders.item.CardItemView
-import com.evaluation.adapter.viewholders.item.NoItemView
 import com.evaluation.repository.AppRepository
-import com.evaluation.utils.Resource
-import com.evaluation.utils.defIfNull
+import com.evaluation.utils.NetworkState
+import com.evaluation.utils.PAGE_LIMIT
+import com.evaluation.utils.PAGE_START
 import com.evaluation.utils.empty
-import com.evaluation.utils.observeOnce
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -23,97 +15,58 @@ import javax.inject.Inject
  * @since 08.10.2020
  */
 class UserDataSource @Inject constructor(
-    private val context: Context,
     private val repository: AppRepository
-) : PageKeyedDataSource<String, BaseItemView>() {
+) : PageKeyedDataSource<Int, BaseItemView>() {
 
-    private val userList: MutableList<BaseItemView> = mutableListOf()
+    var query = empty()
+    val network = MutableLiveData<Boolean>()
 
-    var state: MutableLiveData<Boolean> = MutableLiveData()
-
-    var word: String = empty()
-
-    private var loaderJob: Job? = null
-
-    private var currentPage = 1
-
-    private var pageCount = 0
-
-    override fun loadInitial(params: LoadInitialParams<String>, callback: LoadInitialCallback<String, BaseItemView>) {
-        loaderJob?.cancel()
-        loaderJob = GlobalScope.launch(Dispatchers.Main) {
-            repository.userList(word, currentPage).observeOnce { resource ->
-                when (resource.status) {
-                    Resource.Status.SUCCESS -> {
-                        currentPage = 1
-                        userList.clear()
-                        resource.data?.forEach {
-                            userList.add(CardItemView(id = it.id.defIfNull().toString(), user = it))
-                        }
-                        userList.ifEmpty {
-                            userList.add(NoItemView(title = context.resources.getString(R.string.result).defIfNull()))
-                        }
-                        currentPage++
-                        pageCount = resource.message?.toInt().defIfNull()
-                        if (currentPage < pageCount) {
-                            currentPage++
-                            callback.onResult(userList, null, userList.last().id)
-                        } else {
-                            currentPage = 1
-                            state.value = false
-                            callback.onResult(userList, null, null)
-                        }
-                    }
-
-                    Resource.Status.ERROR -> {
-                        state.value = false
-                        userList.clear()
-                        userList.add(NoItemView(title = context.resources.getString(R.string.result).defIfNull()))
-                        callback.onResult(userList, null, null)
-                    }
-
-                    Resource.Status.LOADING -> {
-                        state.value = true
-                    }
-                }
-            }
-        }
+    override fun loadInitial(params: LoadInitialParams<Int>, callback: LoadInitialCallback<Int, BaseItemView>) {
+        repository.userListSync(
+            query = query,
+            page = PAGE_START,
+            perPage = PAGE_LIMIT,
+            onPrepared = {
+                postInitialState(NetworkState.LOADING)
+            },
+            onSuccess = { userList ->
+                postInitialState(NetworkState.LOADED)
+                callback.onResult(userList, null, PAGE_START + 1)
+            },
+            onError = { userList ->
+                postInitialState(NetworkState.LOADED)
+                callback.onResult(userList, null, null)
+            })
     }
 
-    override fun loadAfter(params: LoadParams<String>, callback: LoadCallback<String, BaseItemView>) {
-        loaderJob?.cancel()
-        loaderJob = GlobalScope.launch(Dispatchers.Main) {
-            repository.userList(word, currentPage).observeOnce { resource ->
-                when (resource.status) {
-                    Resource.Status.SUCCESS -> {
-                        state.value = false
-                        userList.clear()
-                        resource.data?.forEach {
-                            userList.add(CardItemView(id = it.id.defIfNull().toString(), user = it))
-                        }
-                        if (currentPage < pageCount) {
-                            currentPage++
-                            callback.onResult(userList, userList.last().id)
-                        } else {
-                            currentPage = 1
-                            callback.onResult(userList, null)
-                        }
-                    }
-
-                    Resource.Status.ERROR -> {
-                        state.value = false
-                    }
-
-                    Resource.Status.LOADING -> {
-                        state.value = true
-                    }
-                }
-            }
-        }
+    override fun loadAfter(params: LoadParams<Int>, callback: LoadCallback<Int, BaseItemView>) {
+        repository.userListAsync(
+            query = query,
+            page = params.key,
+            perPage = params.requestedLoadSize,
+            onPrepared = {
+                postAfterState(NetworkState.LOADING)
+            },
+            onSuccess = { userList ->
+                postAfterState(NetworkState.LOADED)
+                callback.onResult(userList, params.key + 1)
+            },
+            onError = {
+                postAfterState(NetworkState.LOADED)
+                callback.onResult(listOf(), null)
+            })
     }
 
-    override fun loadBefore(params: LoadParams<String>, callback: LoadCallback<String, BaseItemView>) {
+    override fun loadBefore(params: LoadParams<Int>, callback: LoadCallback<Int, BaseItemView>) {
 
+    }
+
+    private fun postInitialState(state: NetworkState) {
+        network.postValue(state.value())
+    }
+
+    private fun postAfterState(state: NetworkState) {
+        network.postValue(state.value())
     }
 
 }

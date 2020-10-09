@@ -13,3 +13,5 @@ const val PAGE_START = 1
 const val PAGE_LIMIT = 20
 
 const val NO_ITEM = "NO_ITEM"
+
+const val THREADS = 5

@@ -39,7 +39,7 @@ android {
     }
 
     buildFeatures {
-        viewBinding = true
+        dataBinding true
     }
 }
 
@@ -112,6 +112,7 @@ dependencies {
     // FragmentNavigation
     implementation dep.fragmentNavigation
     implementation dep.fragmentNavigationUi
+    implementation dep.fragmentNavigationFeature
 
     // Timber
     implementation dep.timber

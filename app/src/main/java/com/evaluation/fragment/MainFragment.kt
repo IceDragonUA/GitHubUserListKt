@@ -15,6 +15,7 @@ import com.evaluation.adapter.AdapterItemClickListener
 import com.evaluation.adapter.viewholders.CardItemHolder
 import com.evaluation.adapter.viewholders.NoItemHolder
 import com.evaluation.databinding.MainLayoutBinding
+import com.evaluation.utils.ModeType
 import com.evaluation.utils.autoCleared
 import com.evaluation.viewmodel.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -77,12 +78,12 @@ class MainFragment : Fragment(), AdapterItemClickListener<String> {
         viewModel.iterator.observe(viewLifecycleOwner, { source ->
             source?.third?.let {
                 when (it) {
-                    false -> {
+                    ModeType.LOADING -> {
                         source.first?.let { state ->
                             binding.progressSpinner.visibility = if (state) View.VISIBLE else View.GONE
                         }
                     }
-                    true -> {
+                    ModeType.UPDATE -> {
                         source.second?.let { users ->
                             binding.listView.adapter.submitList(users)
                         }

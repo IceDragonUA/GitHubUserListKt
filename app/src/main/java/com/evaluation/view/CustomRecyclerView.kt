@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.evaluation.adapter.AdapterItemClickListener
 import com.evaluation.adapter.CustomListAdapter
 import com.evaluation.adapter.factory.TypesFactoryImpl
-import com.evaluation.adapter.viewholders.item.BaseItemView
+import com.evaluation.adapter.viewholder.item.BaseItemView
 
 /**
  * @author Vladyslav Havrylenko
@@ -25,7 +25,7 @@ class CustomRecyclerView : RecyclerView, AdapterItemClickListener<BaseItemView> 
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
         layoutManager = LinearLayoutManager(context)
         adapter = CustomListAdapter(TypesFactoryImpl(), this)
-        itemAnimator = DefaultItemAnimator()
+        itemAnimator = null
     }
 
     override fun getAdapter(): CustomListAdapter =

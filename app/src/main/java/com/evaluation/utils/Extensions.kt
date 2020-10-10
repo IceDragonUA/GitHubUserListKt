@@ -1,11 +1,6 @@
 package com.evaluation.utils
 
 import android.widget.ImageView
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
-import com.evaluation.R
-import com.evaluation.adapter.viewholders.item.CardItemView
-import com.evaluation.adapter.viewholders.item.NoItemView
 import com.evaluation.glide.GlideApp
 
 /**
@@ -14,6 +9,8 @@ import com.evaluation.glide.GlideApp
  */
 fun String?.defIfNull() = this ?: ""
 fun Int?.defIfNull(def: Int = 0) = this ?: def
+fun Long?.defIfNull(def: Long = 0L) = this ?: def
+fun Boolean?.defIfNull(def: Boolean = false) = this ?: def
 
 fun empty() = ""
 

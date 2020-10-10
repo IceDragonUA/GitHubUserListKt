@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -16,7 +17,8 @@
             style="@style/ComponentToolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:title="@string/users" />
+            app:title="@string/users"
+            app:navigationIcon="@drawable/octocat"/>
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -27,8 +29,8 @@
         android:layout_height="match_parent"
         android:baselineAligned="false"
         app:defaultNavHost="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:navGraph="@navigation/nav_graph"
-        tools:context="com.evaluation.fragment.main.MainFragment"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        tools:context="com.evaluation.search.fragment.MainFragment" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

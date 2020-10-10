@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/mainFragment"
-        android:name="com.evaluation.fragment.main.MainFragment"
+        android:name="com.evaluation.search.fragment.MainFragment"
         android:label="@string/users">
         <action
             android:id="@+id/action_mainFragment_to_detailFragment"
@@ -15,7 +15,7 @@
     </fragment>
     <fragment
         android:id="@+id/detailFragment"
-        android:name="com.evaluation.fragment.detail.DetailFragment"
+        android:name="com.evaluation.details.fragment.DetailFragment"
         android:label="{userLogin}" >
         <argument
             android:name="userId"

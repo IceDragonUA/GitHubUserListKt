@@ -5,8 +5,8 @@ import android.view.ViewGroup
 import androidx.paging.PagedListAdapter
 import com.evaluation.adapter.diffutils.ItemDiffItemCallback
 import com.evaluation.adapter.factory.TypesFactory
-import com.evaluation.adapter.viewholders.BaseViewHolder
-import com.evaluation.adapter.viewholders.item.BaseItemView
+import com.evaluation.adapter.viewholder.BaseViewHolder
+import com.evaluation.adapter.viewholder.item.BaseItemView
 
 class CustomListAdapter constructor(private val typeFactory: TypesFactory, private val listener: AdapterItemClickListener<*>? = null) :
     PagedListAdapter<BaseItemView, BaseViewHolder<BaseItemView>>(ItemDiffItemCallback()) {

@@ -1,11 +1,10 @@
 package com.evaluation.network
 
-import com.evaluation.model.UserList
-import com.evaluation.utils.PAGE_LIMIT
-import com.evaluation.utils.PAGE_START
+import com.evaluation.details.model.rest.UserDetails
+import com.evaluation.search.model.UserList
 import retrofit2.Call
-import retrofit2.Response
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface RestApi {
@@ -16,5 +15,10 @@ interface RestApi {
         @Query("page") page: Int,
         @Query("per_page") perPage: Int
     ): Call<UserList>
+
+    @GET("users/{id}")
+    fun userDetails(
+        @Path("id") query: String
+    ): Call<UserDetails>
 
 }

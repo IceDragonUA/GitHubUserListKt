@@ -9,4 +9,5 @@ import androidx.paging.PagedList
 data class Listing<T>(
         val pagedList: LiveData<PagedList<T>>,
         val networkState: LiveData<Boolean>,
+        val backgroundState: LiveData<Boolean>,
 )

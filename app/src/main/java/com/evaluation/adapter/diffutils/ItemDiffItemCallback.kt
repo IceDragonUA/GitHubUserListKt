@@ -1,7 +1,7 @@
 package com.evaluation.adapter.diffutils
 
 import androidx.recyclerview.widget.DiffUtil
-import com.evaluation.adapter.viewholders.item.BaseItemView
+import com.evaluation.adapter.viewholder.item.BaseItemView
 
 /**
  * @author Vladyslav Havrylenko

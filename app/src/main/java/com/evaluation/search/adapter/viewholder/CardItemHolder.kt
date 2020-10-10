@@ -13,6 +13,7 @@ class CardItemHolder(itemView: View, listener: AdapterItemClickListener<CardItem
     override fun bind(item: CardItemView) {
         itemView.image.loadFromUrl(item.user.avatar_url)
         itemView.title.text = item.user.login
+        itemView.site.text = item.user.html_url
         itemView.setOnClickListener {
             listener?.onClicked(item)
         }

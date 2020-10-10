@@ -1,6 +1,7 @@
 package com.evaluation.utils
 
 import android.widget.ImageView
+import com.evaluation.R
 import com.evaluation.glide.GlideApp
 
 /**
@@ -17,5 +18,6 @@ fun empty() = ""
 fun ImageView.loadFromUrl(url: String) {
     GlideApp.with(this.context.applicationContext)
         .load(url)
+        .placeholder(R.drawable.octocat)
         .into(this)
 }

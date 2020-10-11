@@ -10,10 +10,10 @@ import com.evaluation.search.model.item.rest.User
 @Dao
 interface AppUsersDatabaseDao {
 
-    @Query("SELECT * FROM users ORDER BY time ASC")
+    @Query("SELECT * FROM users ORDER BY `index` ASC")
     fun userList(): List<UserTableItem>
 
-    @Query("SELECT * FROM users ORDER BY time ASC LIMIT :limit OFFSET :offset ")
+    @Query("SELECT * FROM users ORDER BY `index` ASC LIMIT :limit OFFSET :offset ")
     fun userPagedList(limit: Int, offset: Int): List<UserTableItem>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

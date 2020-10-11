@@ -1,16 +1,20 @@
 package com.evaluation.search.model.item.database
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 /**
  * @author Vladyslav Havrylenko@Entity(tableName = "users")
  * @since 07.10.2020
  */
-@Entity(tableName = "users")
+@Entity(tableName = "users", indices = [Index(value = ["id"], unique = true)])
 data class UserTableItem(
+    @PrimaryKey(autoGenerate = true)
+    var index: Int? = null,
     val login: String,
-    @PrimaryKey
+    @ColumnInfo(name = "id")
     val id: Int,
     val node_id: String,
     val avatar_url: String,
@@ -24,5 +28,4 @@ data class UserTableItem(
     val received_events_url: String,
     val type: String,
     val score: Int,
-    var time: Long = 0
 )

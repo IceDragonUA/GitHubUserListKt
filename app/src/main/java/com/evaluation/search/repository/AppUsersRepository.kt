@@ -41,10 +41,6 @@ class AppUsersRepository @Inject constructor(
             },
             onSuccess = { userList ->
                 appUsersDatabaseDao.deleteList()
-                userList.items.forEach {
-                    it.time = System.currentTimeMillis()
-                }
-
                 appUsersDatabaseDao.insertList(
                     userList.items.map {
                         mapper.toTableItem(it)
@@ -95,10 +91,6 @@ class AppUsersRepository @Inject constructor(
                 onPrepared()
             },
             onSuccess = { userList ->
-                userList.items.forEach {
-                    it.time = System.currentTimeMillis()
-                }
-
                 appUsersDatabaseDao.insertList(
                     userList.items.map {
                         mapper.toTableItem(it)

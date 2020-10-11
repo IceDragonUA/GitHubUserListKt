@@ -27,8 +27,7 @@ class UserMapper @Inject constructor() {
                 repos_url = it.repos_url.defIfNull(),
                 received_events_url = it.received_events_url.defIfNull(),
                 type = it.type.defIfNull(),
-                score = it.score.defIfNull(),
-                time = it.time.defIfNull()
+                score = it.score.defIfNull()
             )
         }
     }

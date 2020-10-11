@@ -18,6 +18,5 @@ data class User(
     val repos_url: String,
     val received_events_url: String,
     val type: String,
-    val score: Int,
-    var time: Long = 0
+    val score: Int
 )

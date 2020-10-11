@@ -17,6 +17,7 @@ import com.evaluation.utils.ICONIFIED
 import com.evaluation.utils.QUERY
 import com.evaluation.utils.autoCleared
 import com.evaluation.search.viewmodel.UserViewModel
+import com.evaluation.utils.DEFAULT_POSITION
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 
@@ -158,7 +159,12 @@ class MainFragment : Fragment(), AdapterItemClickListener<BaseItemView>,
     }
 
     private fun initLoader() {
-        viewModel.items.observe(viewLifecycleOwner, binding.listView.adapter::submitList)
+        viewModel.items.observe(viewLifecycleOwner) {
+            if (it.isNullOrEmpty()) {
+                binding.listView.scrollToPosition(DEFAULT_POSITION)
+            }
+            binding.listView.adapter.submitList(it)
+        }
     }
 
 }

@@ -17,8 +17,7 @@
             style="@style/ComponentToolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:title="@string/users"
-            app:navigationIcon="@drawable/octocat"/>
+            app:title="@string/users" />
 
     </com.google.android.material.appbar.AppBarLayout>
 

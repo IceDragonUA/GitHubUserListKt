@@ -1,6 +1,7 @@
 package com.evaluation.utils
 
 import android.widget.ImageView
+import android.widget.TextView
 import com.evaluation.R
 import com.evaluation.glide.GlideApp
 
@@ -20,4 +21,9 @@ fun ImageView.loadFromUrl(url: String) {
         .load(url)
         .placeholder(R.drawable.octocat)
         .into(this)
+}
+
+fun TextView.initText(text: String) {
+    if (text.isNotEmpty()) this.text = text else this.text =
+        this.context.applicationContext.getString(R.string.none)
 }

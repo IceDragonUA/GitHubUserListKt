@@ -35,4 +35,29 @@
         <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
     </style>
 
+    <style name="DetailImage">
+        <item name="android:layout_width">@dimen/detail_img_size</item>
+        <item name="android:layout_height">@dimen/detail_img_size</item>
+        <item name="android:layout_marginTop">@dimen/card_text_padding</item>
+        <item name="android:layout_marginLeft">@dimen/card_text_padding</item>
+        <item name="android:layout_marginBottom">@dimen/card_text_padding</item>
+        <item name="android:layout_marginRight">@dimen/card_text_padding</item>
+    </style>
+
+    <style name="DetailText">
+        <item name="android:paddingLeft">@dimen/card_text_padding</item>
+        <item name="android:paddingRight">@dimen/card_text_padding</item>
+        <item name="android:layout_marginTop">@dimen/card_text_padding</item>
+        <item name="android:layout_marginLeft">@dimen/card_text_padding</item>
+        <item name="android:layout_marginRight">@dimen/card_text_padding</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+
+    <style name="DetailTwitter">
+        <item name="android:paddingLeft">@dimen/card_text_padding</item>
+        <item name="android:paddingRight">@dimen/card_text_padding</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
 </resources>

@@ -3,6 +3,7 @@ package com.evaluation.search.datasource
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.PageKeyedDataSource
 import com.evaluation.adapter.viewholder.item.BaseItemView
+import com.evaluation.adapter.viewholder.item.NoItemView
 import com.evaluation.search.repository.AppUsersRepository
 import com.evaluation.utils.*
 import javax.inject.Inject
@@ -26,15 +27,16 @@ class AppUserDataSource @Inject constructor(
             page = PAGE_START,
             perPage = PAGE_LIMIT,
             onPrepared = {
-                postInitialState(NetworkState.LOADING, initBackgroundState())
+                postInitialState(initNetworkState(), initBackgroundState())
             },
             onSuccess = { userList ->
-                postInitialState(NetworkState.LOADING, BackgroundState.HIDE)
-                callback.onResult(userList, null, PAGE_START + 1)
+                val refresh = userList.firstOrNull() is NoItemView
+                postInitialState(refreshNetworkState(refresh), refreshBackgroundState(refresh))
+                callback.onResult(initList(userList), null, initPaging(refresh))
             },
             onError = { userList ->
                 postInitialState(NetworkState.LOADED, BackgroundState.SHOW)
-                callback.onResult(userList, null, null)
+                callback.onResult(initList(userList), null, null)
             })
     }
 
@@ -44,14 +46,14 @@ class AppUserDataSource @Inject constructor(
             page = params.key,
             perPage = params.requestedLoadSize,
             onPrepared = {
-                postAfterState(NetworkState.LOADING, BackgroundState.HIDE)
+                postAfterState(NetworkState.LOADING)
             },
             onSuccess = { userList ->
-                postAfterState(NetworkState.LOADED, BackgroundState.HIDE)
+                postAfterState(NetworkState.LOADED)
                 callback.onResult(userList, params.key + 1)
             },
             onError = {
-                postAfterState(NetworkState.LOADED, BackgroundState.HIDE)
+                postAfterState(NetworkState.LOADED)
                 callback.onResult(listOf(), null)
             })
     }
@@ -65,11 +67,25 @@ class AppUserDataSource @Inject constructor(
         background.postValue(backgroundState.value())
     }
 
-    private fun postAfterState(networkState: NetworkState, backgroundState: BackgroundState) {
+    private fun postAfterState(networkState: NetworkState) {
         network.postValue(networkState.value())
-        background.postValue(backgroundState.value())
     }
 
-    private fun initBackgroundState() = if (initBackgroundState) BackgroundState.SHOW else BackgroundState.HIDE
+    private fun initList(userList: MutableList<BaseItemView>) =
+        if (query.isEmpty()) listOf() else userList
+
+    private fun initPaging(refresh: Boolean) = if (refresh) null else PAGE_START + 1
+
+    private fun initNetworkState() =
+        if (query.isEmpty()) NetworkState.LOADED else NetworkState.LOADING
+
+    private fun initBackgroundState() =
+        if (initBackgroundState) BackgroundState.SHOW else BackgroundState.HIDE
+
+    private fun refreshNetworkState(refresh: Boolean) =
+        if (refresh) NetworkState.LOADED else NetworkState.LOADING
+
+    private fun refreshBackgroundState(refresh: Boolean) =
+        if (refresh) BackgroundState.SHOW else BackgroundState.HIDE
 
 }

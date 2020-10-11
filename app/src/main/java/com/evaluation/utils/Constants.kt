@@ -9,6 +9,7 @@ const val BASE_URL = "https://api.github.com/"
 const val DATABASE_NAME = "database"
 const val DATABASE_VERSION = 1
 
+const val DEFAULT_POSITION = 0
 const val PAGE_START = 1
 const val PAGE_LIMIT = 20
 

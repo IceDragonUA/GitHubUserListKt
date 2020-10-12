@@ -29,6 +29,8 @@ android {
         versionName VERSION_NAME
 
         multiDexEnabled true
+
+        testInstrumentationRunner TEST
     }
 
     buildTypes {
@@ -121,5 +123,5 @@ dependencies {
     implementation dep.constraintLayout
 
     testImplementation dep.junit
-    implementation dep.mockito
+    testImplementation dep.mockito
 }

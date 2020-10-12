@@ -10,6 +10,8 @@ ext {
     APP_ID = "com.evaluation"
     VERSION_CODE= 1
     VERSION_NAME= "1"
+
+    TEST = "androidx.test.runner.AndroidJUnitRunner"
 }
 
 buildscript {

@@ -8,7 +8,9 @@ import com.evaluation.adapter.viewholder.item.NoItemView
 import com.evaluation.search.database.AppUsersDatabaseDao
 import com.evaluation.search.mapper.UserMapper
 import com.evaluation.search.network.AppUsersRestApiDao
+import com.evaluation.search.network.AppUsersRestApiDaoImpl
 import com.evaluation.utils.defIfNull
+import io.reactivex.disposables.Disposable
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -24,89 +26,87 @@ class AppUsersRepository @Inject constructor(
     private val appUsersDatabaseDao: AppUsersDatabaseDao
 ) {
 
-    fun userListSync(
+    fun userListInit(
         query: String,
         page: Int,
         perPage: Int,
         onPrepared: () -> Unit,
         onSuccess: (MutableList<BaseItemView>) -> Unit,
         onError: (MutableList<BaseItemView>) -> Unit
-    ) {
-        appUsersRestApiDao.userListSync(
-            query = query,
-            page = page,
-            perPage = perPage,
-            onPrepared = {
+    ): Disposable {
+        return appUsersRestApiDao.userList(query = query, page = page, perPage = perPage)
+            .doOnSubscribe {
                 onPrepared()
-            },
-            onSuccess = { userList ->
-                appUsersDatabaseDao.deleteList()
-                appUsersDatabaseDao.insertList(
-                    userList.items.map {
-                        mapper.toTableItem(it)
-                    }
-                )
+            }
+            .subscribe(
+                { userList ->
+                    appUsersDatabaseDao.deleteList()
+                    appUsersDatabaseDao.insertList(
+                        userList.items.map {
+                            mapper.toTableItem(it)
+                        }
+                    )
 
-                val itemList: MutableList<BaseItemView> = mutableListOf()
-                appUsersDatabaseDao.userList().forEach {
-                    itemList.add(CardItemView(id = it.id.defIfNull().toString(), user = it))
-                }
-                itemList.ifEmpty {
+                    val itemList: MutableList<BaseItemView> = mutableListOf()
+                    appUsersDatabaseDao.userList().forEach {
+                        itemList.add(CardItemView(id = it.id.defIfNull().toString(), user = it))
+                    }
+                    itemList.ifEmpty {
+                        itemList.add(
+                            NoItemView(
+                                title = context.resources.getString(R.string.result).defIfNull()
+                            )
+                        )
+                    }
+
+                    onSuccess(itemList)
+                },
+                { errorMessage ->
+                    Timber.e(errorMessage, "Loading error")
+
+                    val itemList: MutableList<BaseItemView> = mutableListOf()
                     itemList.add(
                         NoItemView(
                             title = context.resources.getString(R.string.result).defIfNull()
                         )
                     )
+
+                    onError(itemList)
                 }
-
-                onSuccess(itemList)
-            },
-            onError = { errorMessage ->
-                Timber.e(errorMessage, "Loading error")
-
-                val itemList: MutableList<BaseItemView> = mutableListOf()
-                itemList.add(
-                    NoItemView(
-                        title = context.resources.getString(R.string.result).defIfNull()
-                    )
-                )
-
-                onError(itemList)
-            })
+            )
     }
 
-    fun userListAsync(
+    fun userListPaged(
         query: String,
         page: Int,
         perPage: Int,
         onPrepared: () -> Unit,
         onSuccess: (MutableList<BaseItemView>) -> Unit,
         onError: () -> Unit
-    ) {
-        appUsersRestApiDao.userListAsync(
-            query = query,
-            page = page,
-            perPage = perPage,
-            onPrepared = {
+    ): Disposable {
+        return appUsersRestApiDao.userList(query = query, page = page, perPage = perPage)
+            .doOnSubscribe {
                 onPrepared()
-            },
-            onSuccess = { userList ->
-                appUsersDatabaseDao.insertList(
-                    userList.items.map {
-                        mapper.toTableItem(it)
+            }
+            .subscribe(
+                { userList ->
+                    appUsersDatabaseDao.insertList(
+                        userList.items.map {
+                            mapper.toTableItem(it)
+                        }
+                    )
+
+                    val itemList: MutableList<BaseItemView> = mutableListOf()
+                    appUsersDatabaseDao.userPagedList(perPage, ((page - 1) * perPage)).forEach {
+                        itemList.add(CardItemView(id = it.id.defIfNull().toString(), user = it))
                     }
-                )
 
-                val itemList: MutableList<BaseItemView> = mutableListOf()
-                appUsersDatabaseDao.userPagedList(perPage, ((page - 1) * perPage)).forEach {
-                    itemList.add(CardItemView(id = it.id.defIfNull().toString(), user = it))
+                    onSuccess(itemList)
+                },
+                { errorMessage ->
+                    Timber.e(errorMessage, "Loading error")
+                    onError()
                 }
-
-                onSuccess(itemList)
-            },
-            onError = { errorMessage ->
-                Timber.e(errorMessage, "Loading error")
-                onError()
-            })
+            )
     }
 }

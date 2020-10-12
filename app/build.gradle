@@ -101,6 +101,7 @@ dependencies {
 
     // Retrofit
     implementation dep.retrofit
+    implementation dep.retrofitAdaptRx
     implementation dep.retrofitConvGson
     implementation dep.okhttpLogging
 
@@ -118,4 +119,7 @@ dependencies {
     implementation dep.timber
 
     implementation dep.constraintLayout
+
+    testImplementation dep.junit
+    implementation dep.mockito
 }

@@ -22,7 +22,7 @@ class AppUserDataSource @Inject constructor(
     val background = MutableLiveData<Boolean>()
 
     override fun loadInitial(params: LoadInitialParams<Int>, callback: LoadInitialCallback<Int, BaseItemView>) {
-        repository.userListSync(
+        repository.userListInit(
             query = query,
             page = PAGE_START,
             perPage = PAGE_LIMIT,
@@ -41,7 +41,7 @@ class AppUserDataSource @Inject constructor(
     }
 
     override fun loadAfter(params: LoadParams<Int>, callback: LoadCallback<Int, BaseItemView>) {
-        repository.userListAsync(
+        repository.userListPaged(
             query = query,
             page = params.key,
             perPage = params.requestedLoadSize,

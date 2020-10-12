@@ -8,9 +8,10 @@ import com.evaluation.details.database.AppUserDetailDatabaseDao
 import com.evaluation.details.datasource.AppDetailDataSource
 import com.evaluation.details.datasource.AppDetailDataSourceFactory
 import com.evaluation.details.mapper.UserDetailsMapper
+import com.evaluation.details.network.AppUserDetailRestApiDao
 import com.evaluation.search.interaction.AppUserDetailInteraction
 import com.evaluation.search.interaction.AppUserDetailInteractionImpl
-import com.evaluation.details.network.AppUserDetailRestApiDao
+import com.evaluation.details.network.AppUserDetailRestApiDaoImpl
 import com.evaluation.details.repository.AppUserDetailRepository
 import dagger.Module
 import dagger.Provides
@@ -25,7 +26,7 @@ object DataUserDetailModule {
 
     @Singleton
     @Provides
-    fun appRest(appRest: RestApi): AppUserDetailRestApiDao = AppUserDetailRestApiDao(appRest)
+    fun appRest(appRest: RestApi): AppUserDetailRestApiDao = AppUserDetailRestApiDaoImpl(appRest)
 
     @Provides
     @Singleton
@@ -33,7 +34,7 @@ object DataUserDetailModule {
 
     @Singleton
     @Provides
-    fun appRepository(context: Context, mapper: UserDetailsMapper, remoteDao: AppUserDetailRestApiDao, localDao: AppUserDetailDatabaseDao) =
+    fun appRepository(context: Context, mapper: UserDetailsMapper, remoteDao: AppUserDetailRestApiDaoImpl, localDao: AppUserDetailDatabaseDao) =
         AppUserDetailRepository(context, mapper, remoteDao, localDao)
 
     @Singleton

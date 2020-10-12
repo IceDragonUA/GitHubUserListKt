@@ -22,7 +22,7 @@ class AppDetailDataSource @Inject constructor(
     val background = MutableLiveData<Boolean>()
 
     override fun loadInitial(params: LoadInitialParams<Int>, callback: LoadInitialCallback<Int, BaseItemView>) {
-        repository.userDetailsSync(
+        repository.userDetailsInit(
             query = query,
             onPrepared = {
                 postInitialState(NetworkState.LOADING, BackgroundState.SHOW)

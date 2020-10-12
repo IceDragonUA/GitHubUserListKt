@@ -24,7 +24,9 @@ class DetailViewModel @ViewModelInject constructor(
     }
 
     fun load(query: String){
-        this.query.value = query
+        if (this.query.value != query) {
+            this.query.value = query
+        }
     }
 
 }

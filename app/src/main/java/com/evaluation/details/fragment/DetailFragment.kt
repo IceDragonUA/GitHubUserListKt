@@ -11,8 +11,8 @@ import com.evaluation.R
 import com.evaluation.adapter.AdapterItemClickListener
 import com.evaluation.adapter.viewholder.item.BaseItemView
 import com.evaluation.databinding.DetailLayoutBinding
-import com.evaluation.utils.autoCleared
 import com.evaluation.details.viewmodel.DetailViewModel
+import com.evaluation.utils.autoCleared
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 
